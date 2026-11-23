@@ -55,3 +55,35 @@ default search radius of roughly half its field of view (e.g. 0.05 deg for NICER
 AstroSat (ISSDC AstroBrowse/PRADAN) and Insight-HXMT (IHEP) only offer web portals, with
 no catalogue that a program can query. SVOM needs credentials. They are not supported
 for now.
+
+## What counts as simultaneous
+
+Each observation is a time interval from its catalogue start to its catalogue end. A group
+of observations, one per mission, is *simultaneous within a tolerance T* if one time
+window of length T touches all of them:
+
+    max(starts) - min(ends) <= T
+
+With T = 0 all observations share at least one instant. Every match also reports
+`overlap = min(ends) - max(starts)` in seconds. A positive value is how long all the
+missions observed together; a negative value is the gap that had to be bridged.
+
+The group condition holds if and only if it holds for every pair in the group. (The
+largest start and the smallest end either belong to two different observations, which
+is a pair condition, or to the same one, where start - end <= 0 <= T anyway.) This is
+why A overlapping B and B overlapping C does *not* make A, B and C a match when A and C
+are far apart.
+
+The search (`find_simultaneous.match.find_matches`) takes the missions one at a time,
+smallest catalogue first. For each candidate it keeps the latest start and earliest end
+chosen so far, and finds the next mission's compatible observations by binary search on
+the sorted start times. A test checks it against trying every combination.
+
+Every compatible combination is reported. If NICER observed twice during one NuSTAR
+observation, that gives two rows. With `min_missions` smaller than the number of
+missions, every subset of at least that many missions is searched, so pairs are also
+reported. A pair that is part of a reported triplet appears as its own row too.
+
+**Caveat:** catalogue start and end are not good time intervals. A NICER or RXTE
+observation can span a day or more with only a few ks of data, so an overlap does not
+guarantee photons at the same moment.
