@@ -1,0 +1,86 @@
+# Tests on every push to main and every pull request. Each job is a tox environment
+# (tox.ini), so anything CI runs can be reproduced locally with `tox -e <name>`.
+# The tests that query HEASARC are not here: an archive outage should not fail a pull
+# request. They run weekly, in ci_cron_weekly.yml.
+
+name: CI Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+# A new push to the same branch cancels the runs still going for the previous one.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci_tests:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Code style checks
+            os: ubuntu-latest
+            python: "3.x"
+            toxenv: codestyle
+
+          - name: Python 3.11 (oldest supported)
+            os: ubuntu-latest
+            python: "3.11"
+            toxenv: py311-test
+
+          - name: Python 3.13 with coverage
+            os: ubuntu-latest
+            python: "3.13"
+            toxenv: py313-test-cov
+
+          - name: Python 3.14
+            os: ubuntu-latest
+            python: "3.14"
+            toxenv: py314-test
+
+          - name: macOS - Python 3.13
+            os: macos-latest
+            python: "3.13"
+            toxenv: py313-test
+
+          - name: Documentation build
+            os: ubuntu-latest
+            python: "3.13"
+            toxenv: build_docs
+
+          - name: Source distribution and metadata
+            os: ubuntu-latest
+            python: "3.13"
+            toxenv: check-build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # setuptools_scm derives the version from the git history.
+          fetch-depth: 0
+
+      - name: Set up python ${{ matrix.python }} on ${{ matrix.os }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install tox
+        run: python -m pip install --upgrade pip tox
+
+      - name: Test with tox
+        run: tox -e ${{ matrix.toxenv }}
+
+      - name: Upload coverage to codecov
+        if: contains(matrix.toxenv, '-cov')
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+        continue-on-error: true

@@ -169,3 +169,12 @@ means a gap) and each mission's ObsID (`-` if that mission is not in the group).
 * **Changelog:** each pull request adds a snippet `docs/changes/<PR>.<type>.rst`. Get the
   number with `nextpr`. `towncrier build --version X.Y` folds the snippets into
   `CHANGES.rst`.
+* **Tests and CI:** every CI job is a tox environment (`tox.ini`), so it can be reproduced
+  locally with `tox -e <name>`, e.g. `tox -e py313-test`, `tox -e build_docs`,
+  `tox -e codestyle`. `.github/workflows/ci_tests.yml` runs code style, Python 3.11,
+  3.13 (with coverage) and 3.14 on Linux, 3.13 on macOS, the docs build and a package
+  build check, on every push to main and every pull request. The tests that query HEASARC
+  (`pytest --remote-data`, or `tox -e py313-test-remote`) run only in the weekly workflow
+  `ci_cron_weekly.yml`, together with a link check and the development versions of
+  astropy and astroquery. An archive outage thus never blocks a pull request, but a
+  renamed catalogue column is noticed within a week.

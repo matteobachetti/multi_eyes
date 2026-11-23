@@ -118,4 +118,5 @@ and how matches are defined.
 ```bash
 pytest                 # offline tests
 pytest --remote-data   # also query HEASARC for every mission
+tox -e codestyle,py313-test,build_docs   # what CI runs
 ```

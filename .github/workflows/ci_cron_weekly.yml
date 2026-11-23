@@ -1,0 +1,45 @@
+# Jobs that depend on something outside this repository and should not be able to fail a
+# pull request: the tests that query HEASARC, the links in the documentation, and the
+# development versions of astropy and astroquery. Weekly runs notice breakage, e.g. a
+# renamed catalogue column, without a red cross on someone's branch.
+
+name: Weekly Scheduled CI
+
+on:
+  schedule:
+    # 6am UTC on Mondays
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  cron_tests:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Tests that query HEASARC
+            toxenv: py313-test-remote
+          - name: Development versions of astropy and astroquery, with HEASARC
+            toxenv: py313-test-devdeps-remote
+          - name: Links in the documentation
+            toxenv: linkcheck
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install tox
+        run: python -m pip install --upgrade pip tox
+
+      - name: Run with tox
+        run: tox -e ${{ matrix.toxenv }}
