@@ -114,3 +114,19 @@ about 1300 observations.
 
 `resolve_source` accepts a name (resolved through Sesame: SIMBAD, NED, VizieR), two
 numbers in degrees, or a sexagesimal coordinate pair.
+
+## Command line
+
+    find-simultaneous SOURCE MISSION MISSION [MISSION ...] [options]
+
+* `-t/--tolerance`: largest gap between observations: `1d`, `12h`, `30min`, `3600s`, or
+  a plain number of days. Default 0 (they must overlap).
+* `-n/--min-missions`: also report groups with at least this many missions.
+* `-r/--radius`: search radius in degrees, either one value or `mission=value` pairs
+  (`-r nicer=0.1 xmm=0.3`).
+* `-o/--output`: save the full table. The format comes from the extension (`.ecsv`
+  keeps units and masks; `.csv`, `.fits` also work).
+* `--list-missions`: supported missions, aliases and default radii.
+
+The printed summary shows, for each group, the start date, the overlap in ks (negative
+means a gap) and each mission's ObsID (`-` if that mission is not in the group).
