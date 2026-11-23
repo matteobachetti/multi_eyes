@@ -53,7 +53,25 @@ Main options:
 * `-n/--min-missions`: also report pairs, triplets, ... out of the missions given;
 * `-r/--radius`: cone-search radius in degrees, global (`-r 0.3`) or per mission
   (`-r nicer=0.1 xmm=0.3`);
+* `-g/--group`: print *campaigns* (matches linked by shared observations) instead of
+  every match;
 * `-o/--output`: save the full table (ECSV keeps units and masks).
+
+During a coordinated campaign every compatible combination of ObsIDs is a separate match,
+which can give dozens of rows. `--group` merges matches that share an observation:
+
+```bash
+find-simultaneous "Cyg X-1" NuSTAR XTE AXAF Swift -t 1d -n 3 --group
+```
+
+```
+26 matches within 1 d, in 2 campaigns
+
+campaign       date       days matches best_overlap_ks nustar        rxte              chandra   swift
+-------- ---------------- ---- ------- --------------- ------ ---------------------- --------- ---------------------
+       0 2008-04-18 13:13  1.3      24             8.4      - 93120-01-01-00,931...  8525,9847 00030388002,00030...
+       1 2010-07-22 05:57  0.5       2           -17.0      - 95429-01-02-02,954...      12313 00031651011
+```
 
 ## Python
 
@@ -65,6 +83,10 @@ matches, observations = find_simultaneous(
 )
 matches["missions", "overlap", "nustar_obsid", "nicer_obsid"]
 observations["nicer"]  # every NICER observation of the source
+
+from find_simultaneous import group_matches
+
+campaigns = group_matches(matches)  # one row per campaign
 ```
 
 `matches` has one row per group, with `<mission>_obsid`, `_start`, `_end` (MJD),

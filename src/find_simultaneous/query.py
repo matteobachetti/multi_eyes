@@ -18,6 +18,7 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.table import Table
 
+from .group import assign_campaigns
 from .match import SECONDS_PER_DAY, find_matches
 from .missions import MissionSpec, resolve_mission
 
@@ -272,7 +273,9 @@ def find_simultaneous(
     matches : astropy.table.Table
         See :func:`find_simultaneous.match.find_matches`. Each mission also gets
         ``<mission>_offset`` (distance of the pointing from the source, deg) and
-        ``<mission>_target`` (the observer's target name).
+        ``<mission>_target`` (the observer's target name). The ``campaign`` column
+        numbers the campaigns (matches sharing observations, see
+        :func:`find_simultaneous.group.group_matches`).
     observations : dict
         Mission name -> table of all its observations of the source.
     """
@@ -294,6 +297,7 @@ def find_simultaneous(
         min_missions=min_missions,
         columns=("obsid", "start", "end", "exposure", "offset", "target"),
     )
+    matches.add_column(assign_campaigns(matches, names), name="campaign", index=0)
     if isinstance(source, str):
         matches.meta["source"] = source
     matches.meta["ra"], matches.meta["dec"] = coord.icrs.ra.deg, coord.icrs.dec.deg

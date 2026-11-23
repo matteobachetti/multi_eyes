@@ -88,6 +88,28 @@ reported. A pair that is part of a reported triplet appears as its own row too.
 observation can span a day or more with only a few ks of data, so an overlap does not
 guarantee photons at the same moment.
 
+## Campaigns
+
+Because every compatible combination is reported, a coordinated campaign gives many
+nearly identical matches. For Cyg X-1 with NuSTAR, RXTE, Chandra and Swift (at least
+three, within 1 day) there are 26 matches, but only two campaigns.
+
+`find_simultaneous.group` puts two matches in the same *campaign* if they share at least
+one observation. Campaigns are the chains of matches linked this way. Think of a graph
+whose points are observations, with a line joining the observations of each match: a
+campaign is a connected piece of that graph. It is computed with a union-find structure
+(each observation points to a representative of its set, and two sets are merged by
+re-pointing one representative), in time proportional to the number of matches.
+
+This rule needs no extra parameter, and it never merges two matches that have nothing in
+common, even if they happen on consecutive days. On the other hand, a long observation
+can link matches that are far apart in time: a 3-day RXTE observation overlapping a
+Swift pointing at each end puts both pointings in one campaign.
+
+`find_simultaneous()` adds a `campaign` column to the matches. `group_matches()` gives one
+row per campaign, with the number of matches, the time span, the best single-match
+overlap, and each mission's ObsIDs in time order.
+
 ## Querying the catalogues
 
 `find_simultaneous.query` builds one ADQL query per mission (`build_query`) and sends it
@@ -126,6 +148,8 @@ numbers in degrees, or a sexagesimal coordinate pair.
   (`-r nicer=0.1 xmm=0.3`).
 * `-o/--output`: save the full table. The format comes from the extension (`.ecsv`
   keeps units and masks; `.csv`, `.fits` also work).
+* `-g/--group`: print campaigns instead of every match. With `-o`, the campaigns are also
+  saved, in a file with `_campaigns` added to the name.
 * `--list-missions`: supported missions, aliases and default radii.
 
 The printed summary shows, for each group, the start date, the overlap in ks (negative

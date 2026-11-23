@@ -15,10 +15,11 @@ import numpy as np
 from astropy import units as u
 from astropy.time import Time
 
+from .group import group_matches
 from .missions import list_missions, resolve_mission
 from .query import find_simultaneous
 
-__all__ = ["main", "parse_tolerance", "parse_radius", "summary_table"]
+__all__ = ["main", "parse_tolerance", "parse_radius", "summary_table", "campaign_summary"]
 
 _UNITS = {"s": u.s, "sec": u.s, "min": u.min, "m": u.min, "h": u.h, "hr": u.h, "d": u.day}
 
@@ -80,11 +81,43 @@ def summary_table(matches, missions):
     out = Table()
     if len(matches) == 0:
         return out
+    if "campaign" in matches.colnames:
+        out["campaign"] = matches["campaign"]
     out["date"] = [t[:16] for t in Time(matches["span_start"], format="mjd").iso]
     out["overlap_ks"] = np.round(np.asarray(matches["overlap"]) / 1000, 1)
     for m in missions:
         out[m] = matches[f"{m}_obsid"].astype(str).filled("-")
     return out
+
+
+def _shorten(text, width=40):
+    return text if len(text) <= width else text[: width - 3] + "..."
+
+
+def campaign_summary(campaigns, missions):
+    """
+    A short, readable version of the campaigns: dates, length, overlap and ObsIDs.
+    """
+    from astropy.table import Table
+
+    out = Table()
+    if len(campaigns) == 0:
+        return out
+    out["campaign"] = campaigns["campaign"]
+    out["date"] = [t[:16] for t in Time(campaigns["span_start"], format="mjd").iso]
+    out["days"] = np.round(np.asarray(campaigns["span_end"] - campaigns["span_start"]), 1)
+    out["matches"] = campaigns["n_matches"]
+    out["best_overlap_ks"] = np.round(np.asarray(campaigns["best_overlap"]) / 1000, 1)
+    for m in missions:
+        out[m] = [_shorten(o) if o else "-" for o in campaigns[f"{m}_obsids"]]
+    return out
+
+
+def _campaign_path(path):
+    import os
+
+    stem, ext = os.path.splitext(path)
+    return f"{stem}_campaigns{ext}"
 
 
 def main(argv=None):
@@ -120,7 +153,18 @@ def main(argv=None):
         help="Search radius in deg: one value, or mission=value pairs. "
         "Default: each mission's own (see --list-missions).",
     )
-    parser.add_argument("-o", "--output", help="Save the full table (.ecsv, .csv, .fits, ...)")
+    parser.add_argument(
+        "-g",
+        "--group",
+        action="store_true",
+        help="Print campaigns (matches linked by shared observations) instead of every match.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="Save the full table of matches (.ecsv, .csv, .fits, ...). With --group, the "
+        "campaigns are also saved, with _campaigns added to the file name.",
+    )
     parser.add_argument(
         "--list-missions", action="store_true", help="List the supported missions and exit"
     )
@@ -146,12 +190,19 @@ def main(argv=None):
         radius=radius,
         verbose=True,
     )
-    print(f"\n{len(matches)} groups within {args.tolerance:g}\n")
-    if len(matches):
+    campaigns = group_matches(matches, missions)
+    print(f"\n{len(matches)} matches within {args.tolerance:g}, in {len(campaigns)} campaigns\n")
+    if args.group:
+        if len(campaigns):
+            campaign_summary(campaigns, missions).pprint(max_lines=-1, max_width=-1)
+    elif len(matches):
         summary_table(matches, missions).pprint(max_lines=-1, max_width=-1)
     if args.output:
         matches.write(args.output, overwrite=True)
-        print(f"\nFull table saved to {args.output}")
+        print(f"\nMatches saved to {args.output}")
+        if args.group:
+            campaigns.write(_campaign_path(args.output), overwrite=True)
+            print(f"Campaigns saved to {_campaign_path(args.output)}")
     return 0
 
 
