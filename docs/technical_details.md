@@ -87,3 +87,30 @@ reported. A pair that is part of a reported triplet appears as its own row too.
 **Caveat:** catalogue start and end are not good time intervals. A NICER or RXTE
 observation can span a day or more with only a few ks of data, so an overlap does not
 guarantee photons at the same moment.
+
+## Querying the catalogues
+
+`find_simultaneous.query` builds one ADQL query per mission (`build_query`) and sends it
+to HEASARC's TAP service through `astroquery.heasarc.Heasarc.query_tap`. The query renames
+each catalogue's columns to common names (`t_start`, `t_stop` or `t_duration`, `exposure`,
+`target`). `start` cannot be used as an alias: it is a reserved word for HEASARC's ADQL
+parser, and the query fails with "invalid syntax". `normalize_table` then produces the
+common format, with columns `obsid`, `start`, `end`, `exposure`, `target`, `ra`, `dec` and
+`offset`. `offset` is the distance of the pointing from the source.
+
+Masked (missing) exposures become NaN. A missing duration (Chandra, RXTE) gives an
+observation of zero length.
+
+### INTEGRAL
+
+`intscw` has one row per science window, about 1 hour long, so a single INTEGRAL
+revolution produces dozens of rows. Science windows separated by less than 15 minutes
+(the slews between them) are merged into one observation named `first..last`. Its
+exposure is the sum of the ISGRI good times, `offset` is the smallest offset, and
+`n_merged` counts the science windows. For Cyg X-1 this reduces the INTEGRAL pointings to
+about 1300 observations.
+
+### Source positions
+
+`resolve_source` accepts a name (resolved through Sesame: SIMBAD, NED, VizieR), two
+numbers in degrees, or a sexagesimal coordinate pair.

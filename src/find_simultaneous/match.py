@@ -88,7 +88,10 @@ def _search(prepared, tolerance):
     return results
 
 
-def match_columns(missions):
+DEFAULT_COLUMNS = ("obsid", "start", "end", "exposure")
+
+
+def match_columns(missions, columns=DEFAULT_COLUMNS):
     """
     Names of the output columns, for the given missions.
 
@@ -99,11 +102,11 @@ def match_columns(missions):
     """
     cols = ["n_missions", "missions", "overlap", "span_start", "span_end"]
     for m in missions:
-        cols += [f"{m}_obsid", f"{m}_start", f"{m}_end", f"{m}_exposure"]
+        cols += [f"{m}_{c}" for c in columns]
     return cols
 
 
-def find_matches(observations, tolerance=0.0, min_missions=None):
+def find_matches(observations, tolerance=0.0, min_missions=None, columns=DEFAULT_COLUMNS):
     """
     Find (quasi-)simultaneous observations among several missions.
 
@@ -120,6 +123,9 @@ def find_matches(observations, tolerance=0.0, min_missions=None):
         Smallest number of missions in a group. By default all missions must take part.
         With fewer, every subset of at least ``min_missions`` missions is searched, so
         that, for example, pairs are also found when the third mission is missing.
+    columns : sequence of str, optional
+        Columns of the input tables copied to the output for each mission, as
+        ``<mission>_<column>``. Missing columns are filled with NaN.
 
     Returns
     -------
@@ -169,10 +175,10 @@ def find_matches(observations, tolerance=0.0, min_missions=None):
             for combo in _search([prepared[m] for m in order], tolerance):
                 rows.append(dict(zip(order, combo, strict=True)))
 
-    return _build_table(observations, names, rows)
+    return _build_table(observations, names, rows, columns)
 
 
-def _build_table(observations, names, rows):
+def _build_table(observations, names, rows, columns):
     n = len(rows)
     out = Table()
     starts = np.full((n, len(names)), np.nan)
@@ -182,7 +188,7 @@ def _build_table(observations, names, rows):
         idx = np.array([r.get(m, -1) for r in rows], dtype=int)
         present = idx >= 0
         safe = np.where(present, idx, 0)
-        for col in ("obsid", "start", "end", "exposure"):
+        for col in columns:
             if col in tab.colnames and len(tab) > 0:
                 values = np.asarray(tab[col])[safe] if n else np.asarray(tab[col])[:0]
             else:
