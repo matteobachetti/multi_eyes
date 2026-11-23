@@ -1,14 +1,16 @@
 [build-system]
-requires = ["setuptools>=64"]
+requires = ["setuptools>=77", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "find_simultaneous"
-version = "0.1.0.dev0"
+dynamic = ["version"]
 description = "Find simultaneous or quasi-simultaneous observations of a source by several X-ray missions"
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "BSD-3-Clause" }
+license = "BSD-3-Clause"
+license-files = ["LICENSE.rst"]
+authors = [{ name = "Matteo Bachetti" }]
 dependencies = [
     "numpy",
     "astropy>=6",
@@ -16,7 +18,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-remotedata"]
+test = ["pytest", "pytest-astropy"]
+docs = ["sphinx", "sphinx-astropy[confv2]", "myst-parser", "towncrier"]
+
+[project.urls]
+repository = "https://github.com/matteobachetti/find_simultaneous"
 
 [project.scripts]
 find-simultaneous = "find_simultaneous.cli:main"
@@ -24,12 +30,53 @@ find-simultaneous = "find_simultaneous.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools_scm]
+version_file = "src/find_simultaneous/_version.py"
+
 [tool.pytest.ini_options]
 testpaths = ["tests", "src/find_simultaneous"]
 addopts = "--doctest-modules"
+doctest_plus = "enabled"
+filterwarnings = ["error", "ignore::DeprecationWarning:pyvo"]
 
 [tool.ruff]
 line-length = 100
+extend-exclude = ["src/find_simultaneous/_version.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.towncrier]
+package = "find_simultaneous"
+package_dir = "src"
+directory = "docs/changes"
+filename = "CHANGES.rst"
+start_string = ".. towncrier release notes start\n"
+underlines = ["-", "^", "~"]
+title_format = "{version} ({project_date})"
+issue_format = "`#{issue} <https://github.com/matteobachetti/find_simultaneous/pull/{issue}>`__"
+
+[[tool.towncrier.type]]
+directory = "breaking"
+name = "Backwards-incompatible changes"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "feature"
+name = "New features"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "bugfix"
+name = "Bug fixes"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "doc"
+name = "Documentation"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "trivial"
+name = "Internal changes"
+showcontent = true

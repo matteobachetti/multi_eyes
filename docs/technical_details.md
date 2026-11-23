@@ -154,3 +154,18 @@ numbers in degrees, or a sexagesimal coordinate pair.
 
 The printed summary shows, for each group, the start date, the overlap in ks (negative
 means a gap) and each mission's ObsID (`-` if that mission is not in the group).
+
+## Development infrastructure
+
+* **Version:** derived from git tags by `setuptools_scm`. It writes
+  `src/find_simultaneous/_version.py`, which is not tracked. When running from a source
+  tree that was never installed, `__version__` is `"unknown"`.
+* **Documentation:** Sphinx, configured through `sphinx_astropy.conf.v2` (numpydoc,
+  automodapi, intersphinx, pydata theme), with pages written in Markdown and read by
+  `myst-parser`. `docs/usage.md` includes the usage part of the README, between the
+  `usage-start` and `usage-end` markers, so the two cannot drift apart. The API pages are
+  generated from the docstrings into `docs/api/` (not tracked). Built on Read the Docs
+  (`.readthedocs.yml`), with warnings treated as errors.
+* **Changelog:** each pull request adds a snippet `docs/changes/<PR>.<type>.rst`. Get the
+  number with `nextpr`. `towncrier build --version X.Y` folds the snippets into
+  `CHANGES.rst`.

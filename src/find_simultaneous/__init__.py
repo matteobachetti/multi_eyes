@@ -17,4 +17,7 @@ __all__ = [
     "resolve_mission",
     "resolve_source",
 ]
-__version__ = "0.1.0.dev0"
+try:
+    from ._version import version as __version__
+except ImportError:  # running from a source tree that was never installed
+    __version__ = "unknown"

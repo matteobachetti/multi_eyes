@@ -12,6 +12,8 @@ Supported: NuSTAR, NICER, XMM-Newton, Chandra, RXTE, Swift, Suzaku, Hitomi, XRIS
 ASCA, Ginga, EXOSAT, ROSAT, BeppoSAX, INTEGRAL. Run `find-simultaneous --list-missions`
 for aliases and default search radii.
 
+<!-- usage-start -->
+
 ## Installation
 
 ```bash
@@ -105,6 +107,8 @@ tolerance=0.5)`, where each table has `obsid`, `start` and `end` columns in MJD.
 * Chandra's catalogue has no end time; its length is taken to be the exposure.
 * AstroSat, Insight-HXMT and SVOM are not supported: they have no catalogue that a
   program can query without credentials.
+
+<!-- usage-end -->
 
 See [`docs/technical_details.md`](docs/technical_details.md) for how each catalogue is read
 and how matches are defined.
