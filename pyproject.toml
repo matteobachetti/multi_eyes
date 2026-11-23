@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "find_simultaneous"
+version = "0.1.0.dev0"
+description = "Find simultaneous or quasi-simultaneous observations of a source by several X-ray missions"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "BSD-3-Clause" }
+dependencies = [
+    "numpy",
+    "astropy>=6",
+    "astroquery>=0.4.10",
+]
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-remotedata"]
+
+[project.scripts]
+find-simultaneous = "find_simultaneous.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "src/find_simultaneous"]
+addopts = "--doctest-modules"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
