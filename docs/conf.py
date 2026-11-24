@@ -5,9 +5,9 @@
 
 from sphinx_astropy.conf.v2 import *  # noqa: F403
 
-from find_simultaneous import __version__
+from multi_eyes import __version__
 
-project = "find_simultaneous"
+project = "multi_eyes"
 author = "Matteo Bachetti"
 copyright = "2026, Matteo Bachetti"
 release = __version__
@@ -24,6 +24,6 @@ intersphinx_mapping.update(  # noqa: F405
 )
 
 html_theme_options.update(  # noqa: F405
-    {"github_url": "https://github.com/matteobachetti/find_simultaneous"}
+    {"github_url": "https://github.com/matteobachetti/multi_eyes"}
 )
-html_title = f"find_simultaneous {version}"
+html_title = f"multi_eyes {version}"

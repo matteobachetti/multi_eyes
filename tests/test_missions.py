@@ -1,6 +1,6 @@
 import pytest
 
-from find_simultaneous.missions import MISSIONS, MissionSpec, list_missions, resolve_mission
+from multi_eyes.missions import MISSIONS, MissionSpec, list_missions, resolve_mission
 
 
 @pytest.mark.parametrize(

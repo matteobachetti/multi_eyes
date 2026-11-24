@@ -3,13 +3,13 @@ import pytest
 from astropy.coordinates import SkyCoord
 from astropy.table import Table
 
-from find_simultaneous.missions import MISSIONS
-from find_simultaneous.query import (
+from multi_eyes.missions import MISSIONS
+from multi_eyes.query import (
     build_query,
-    find_simultaneous,
     normalize_table,
     query_mission,
     resolve_source,
+    search,
 )
 
 CYGX1 = SkyCoord(299.590315, 35.201604, unit="deg")
@@ -80,7 +80,7 @@ def test_every_catalogue_query_runs(mission):
 @pytest.mark.remote_data
 def test_cygx1_nustar_nicer():
     """Cyg X-1 has strictly simultaneous NuSTAR and NICER observations."""
-    matches, obs = find_simultaneous("299.590315 35.201604", ["NuSTAR", "NICER"])
+    matches, obs = search("299.590315 35.201604", ["NuSTAR", "NICER"])
     assert len(obs["nustar"]) > 10 and len(obs["nicer"]) > 10
     assert len(matches) > 0
     assert np.all(matches["overlap"] >= 0)

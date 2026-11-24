@@ -8,7 +8,7 @@ docs/_build/
 *.ecsv
 *.csv
 !tests/data/*
-src/find_simultaneous/_version.py
+src/multi_eyes/_version.py
 .tmp/
 .tox/
 docs/api/

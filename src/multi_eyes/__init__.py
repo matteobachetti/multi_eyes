@@ -3,14 +3,14 @@
 from .group import assign_campaigns, group_matches
 from .match import find_matches
 from .missions import MISSIONS, MissionSpec, list_missions, resolve_mission
-from .query import find_simultaneous, query_mission, resolve_source
+from .query import query_mission, resolve_source, search
 
 __all__ = [
     "MISSIONS",
     "MissionSpec",
     "assign_campaigns",
     "find_matches",
-    "find_simultaneous",
+    "search",
     "group_matches",
     "list_missions",
     "query_mission",

@@ -2,7 +2,7 @@ import argparse
 
 import pytest
 
-from find_simultaneous.cli import main, parse_radius, parse_tolerance
+from multi_eyes.cli import main, parse_radius, parse_tolerance
 
 
 def test_tolerance_units():

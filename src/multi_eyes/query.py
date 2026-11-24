@@ -28,7 +28,7 @@ __all__ = [
     "merge_contiguous",
     "resolve_source",
     "query_mission",
-    "find_simultaneous",
+    "search",
 ]
 
 # Science windows closer than this (15 min) are merged into one observation.
@@ -41,7 +41,7 @@ def build_query(spec: MissionSpec, ra_deg: float, dec_deg: float, radius_deg: fl
 
     Examples
     --------
-    >>> from find_simultaneous.missions import MISSIONS
+    >>> from multi_eyes.missions import MISSIONS
     >>> q = build_query(MISSIONS["chandra"], 299.59, 35.20, 0.2)
     >>> "cat.exposure as t_duration" in q and "FROM chanmaster" in q
     True
@@ -98,7 +98,7 @@ def normalize_table(raw: Table, spec: MissionSpec, coord: SkyCoord | None = None
 
     Examples
     --------
-    >>> from find_simultaneous.missions import MISSIONS
+    >>> from multi_eyes.missions import MISSIONS
     >>> raw = Table({"obsid": [1], "t_start": [50000.0], "t_duration": [8640.0],
     ...              "exposure": [8640.0], "ra": [10.0], "dec": [20.0], "target": ["X"]})
     >>> float(normalize_table(raw, MISSIONS["chandra"])["end"][0])
@@ -240,7 +240,7 @@ def _radius_for(spec, radius):
     return radius
 
 
-def find_simultaneous(
+def search(
     source,
     missions,
     tolerance=0.0,
@@ -271,11 +271,11 @@ def find_simultaneous(
     Returns
     -------
     matches : astropy.table.Table
-        See :func:`find_simultaneous.match.find_matches`. Each mission also gets
+        See :func:`multi_eyes.match.find_matches`. Each mission also gets
         ``<mission>_offset`` (distance of the pointing from the source, deg) and
         ``<mission>_target`` (the observer's target name). The ``campaign`` column
         numbers the campaigns (matches sharing observations, see
-        :func:`find_simultaneous.group.group_matches`).
+        :func:`multi_eyes.group.group_matches`).
     observations : dict
         Mission name -> table of all its observations of the source.
     """

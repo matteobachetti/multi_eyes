@@ -1,4 +1,4 @@
-# find_simultaneous
+# multi_eyes
 
 Find the times when a source was observed by several X-ray missions at the same time, or
 within a given tolerance: for example, every time Cyg X-1 was observed by NuSTAR,

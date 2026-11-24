@@ -1,7 +1,7 @@
 from astropy.table import Table
 
-from find_simultaneous.group import assign_campaigns, group_matches
-from find_simultaneous.match import find_matches
+from multi_eyes.group import assign_campaigns, group_matches
+from multi_eyes.match import find_matches
 
 
 def obs(prefix, intervals):

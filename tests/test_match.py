@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from astropy.table import Table
 
-from find_simultaneous.match import find_matches
+from multi_eyes.match import find_matches
 
 
 def obs(prefix, intervals):

@@ -3,7 +3,7 @@ requires = ["setuptools>=77", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "find_simultaneous"
+name = "multi_eyes"
 dynamic = ["version"]
 description = "Find simultaneous or quasi-simultaneous observations of a source by several X-ray missions"
 readme = "README.md"
@@ -22,39 +22,39 @@ test = ["pytest", "pytest-astropy"]
 docs = ["sphinx", "sphinx-astropy[confv2]", "myst-parser", "towncrier"]
 
 [project.urls]
-repository = "https://github.com/matteobachetti/find_simultaneous"
+repository = "https://github.com/matteobachetti/multi_eyes"
 
 [project.scripts]
-find-simultaneous = "find_simultaneous.cli:main"
+multi-eyes = "multi_eyes.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools_scm]
-version_file = "src/find_simultaneous/_version.py"
+version_file = "src/multi_eyes/_version.py"
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "src/find_simultaneous"]
+testpaths = ["tests", "src/multi_eyes"]
 addopts = "--doctest-modules"
 doctest_plus = "enabled"
 filterwarnings = ["error", "ignore::DeprecationWarning:pyvo"]
 
 [tool.ruff]
 line-length = 100
-extend-exclude = ["src/find_simultaneous/_version.py"]
+extend-exclude = ["src/multi_eyes/_version.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B"]
 
 [tool.towncrier]
-package = "find_simultaneous"
+package = "multi_eyes"
 package_dir = "src"
 directory = "docs/changes"
 filename = "CHANGES.rst"
 start_string = ".. towncrier release notes start\n"
 underlines = ["-", "^", "~"]
 title_format = "{version} ({project_date})"
-issue_format = "`#{issue} <https://github.com/matteobachetti/find_simultaneous/pull/{issue}>`__"
+issue_format = "`#{issue} <https://github.com/matteobachetti/multi_eyes/pull/{issue}>`__"
 
 [[tool.towncrier.type]]
 directory = "breaking"

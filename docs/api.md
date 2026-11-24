@@ -1,18 +1,18 @@
 # Reference (API)
 
 ```{eval-rst}
-.. automodapi:: find_simultaneous.query
+.. automodapi:: multi_eyes.query
    :no-inheritance-diagram:
 
-.. automodapi:: find_simultaneous.match
+.. automodapi:: multi_eyes.match
    :no-inheritance-diagram:
 
-.. automodapi:: find_simultaneous.group
+.. automodapi:: multi_eyes.group
    :no-inheritance-diagram:
 
-.. automodapi:: find_simultaneous.missions
+.. automodapi:: multi_eyes.missions
    :no-inheritance-diagram:
 
-.. automodapi:: find_simultaneous.cli
+.. automodapi:: multi_eyes.cli
    :no-inheritance-diagram:
 ```

@@ -1,7 +1,7 @@
 """
 Merge matches into campaigns.
 
-:func:`find_simultaneous.match.find_matches` reports every compatible combination of
+:func:`multi_eyes.match.find_matches` reports every compatible combination of
 observations. During a coordinated campaign this produces many nearly identical rows: if
 one long XMM observation overlaps five NICER ObsIDs, that is five matches. Here, two
 matches belong to the same *campaign* if they share at least one observation, and
@@ -88,8 +88,8 @@ def group_matches(matches: Table, missions=None) -> Table:
     Parameters
     ----------
     matches : astropy.table.Table
-        Output of :func:`~find_simultaneous.match.find_matches` or
-        :func:`~find_simultaneous.query.find_simultaneous`. If it has a ``campaign``
+        Output of :func:`~multi_eyes.match.find_matches` or
+        :func:`~multi_eyes.query.search`. If it has a ``campaign``
         column, that is used; otherwise campaigns are computed with
         :func:`assign_campaigns`.
     missions : list of str, optional

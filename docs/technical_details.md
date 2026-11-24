@@ -2,7 +2,7 @@
 
 ## Mission catalogues
 
-Every mission is described by a `MissionSpec` in `src/find_simultaneous/missions.py`.
+Every mission is described by a `MissionSpec` in `src/multi_eyes/missions.py`.
 Each HEASARC master catalogue stores the same information under different column names:
 
 | Mission | Catalogue | Start | End | Exposure reported |
@@ -74,7 +74,7 @@ is a pair condition, or to the same one, where start - end <= 0 <= T anyway.) Th
 why A overlapping B and B overlapping C does *not* make A, B and C a match when A and C
 are far apart.
 
-The search (`find_simultaneous.match.find_matches`) takes the missions one at a time,
+The search (`multi_eyes.match.find_matches`) takes the missions one at a time,
 smallest catalogue first. For each candidate it keeps the latest start and earliest end
 chosen so far, and finds the next mission's compatible observations by binary search on
 the sorted start times. A test checks it against trying every combination.
@@ -94,7 +94,7 @@ Because every compatible combination is reported, a coordinated campaign gives m
 nearly identical matches. For Cyg X-1 with NuSTAR, RXTE, Chandra and Swift (at least
 three, within 1 day) there are 26 matches, but only two campaigns.
 
-`find_simultaneous.group` puts two matches in the same *campaign* if they share at least
+`multi_eyes.group` puts two matches in the same *campaign* if they share at least
 one observation. Campaigns are the chains of matches linked this way. Think of a graph
 whose points are observations, with a line joining the observations of each match: a
 campaign is a connected piece of that graph. It is computed with a union-find structure
@@ -106,13 +106,13 @@ common, even if they happen on consecutive days. On the other hand, a long obser
 can link matches that are far apart in time: a 3-day RXTE observation overlapping a
 Swift pointing at each end puts both pointings in one campaign.
 
-`find_simultaneous()` adds a `campaign` column to the matches. `group_matches()` gives one
+`search()` adds a `campaign` column to the matches. `group_matches()` gives one
 row per campaign, with the number of matches, the time span, the best single-match
 overlap, and each mission's ObsIDs in time order.
 
 ## Querying the catalogues
 
-`find_simultaneous.query` builds one ADQL query per mission (`build_query`) and sends it
+`multi_eyes.query` builds one ADQL query per mission (`build_query`) and sends it
 to HEASARC's TAP service through `astroquery.heasarc.Heasarc.query_tap`. The query renames
 each catalogue's columns to common names (`t_start`, `t_stop` or `t_duration`, `exposure`,
 `target`). `start` cannot be used as an alias: it is a reserved word for HEASARC's ADQL
@@ -139,7 +139,7 @@ numbers in degrees, or a sexagesimal coordinate pair.
 
 ## Command line
 
-    find-simultaneous SOURCE MISSION MISSION [MISSION ...] [options]
+    multi-eyes SOURCE MISSION MISSION [MISSION ...] [options]
 
 * `-t/--tolerance`: largest gap between observations: `1d`, `12h`, `30min`, `3600s`, or
   a plain number of days. Default 0 (they must overlap).
@@ -158,7 +158,7 @@ means a gap) and each mission's ObsID (`-` if that mission is not in the group).
 ## Development infrastructure
 
 * **Version:** derived from git tags by `setuptools_scm`. It writes
-  `src/find_simultaneous/_version.py`, which is not tracked. When running from a source
+  `src/multi_eyes/_version.py`, which is not tracked. When running from a source
   tree that was never installed, `__version__` is `"unknown"`.
 * **Documentation:** Sphinx, configured through `sphinx_astropy.conf.v2` (numpydoc,
   automodapi, intersphinx, pydata theme), with pages written in Markdown and read by

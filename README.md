@@ -1,4 +1,4 @@
-# find_simultaneous
+# multi_eyes
 
 Find the times when a source was observed by several X-ray missions at the same time,
 or within a given tolerance: for example, every time Cyg X-1 was observed by NuSTAR,
@@ -9,7 +9,7 @@ The observation lists come from the HEASARC master catalogues, queried with
 usual ways (Chandra/AXAF/CXO, RXTE/XTE, XMM/XMM-Newton, Suzaku/Astro-E2, BeppoSAX/SAX, ...).
 
 Supported: NuSTAR, NICER, XMM-Newton, Chandra, RXTE, Swift, Suzaku, Hitomi, XRISM, IXPE,
-ASCA, Ginga, EXOSAT, ROSAT, BeppoSAX, INTEGRAL. Run `find-simultaneous --list-missions`
+ASCA, Ginga, EXOSAT, ROSAT, BeppoSAX, INTEGRAL. Run `multi-eyes --list-missions`
 for aliases and default search radii.
 
 <!-- usage-start -->
@@ -23,7 +23,7 @@ pip install -e .
 ## Command line
 
 ```bash
-find-simultaneous "Cyg X-1" nustar xmm nicer --tolerance 1d --min-missions 2 -o cygx1.ecsv
+multi-eyes "Cyg X-1" nustar xmm nicer --tolerance 1d --min-missions 2 -o cygx1.ecsv
 ```
 
 ```
@@ -63,7 +63,7 @@ During a coordinated campaign every compatible combination of ObsIDs is a separa
 which can give dozens of rows. `--group` merges matches that share an observation:
 
 ```bash
-find-simultaneous "Cyg X-1" NuSTAR XTE AXAF Swift -t 1d -n 3 --group
+multi-eyes "Cyg X-1" NuSTAR XTE AXAF Swift -t 1d -n 3 --group
 ```
 
 ```
@@ -78,15 +78,15 @@ campaign       date       days matches best_overlap_ks nustar        rxte       
 ## Python
 
 ```python
-from find_simultaneous import find_simultaneous
+from multi_eyes import search
 
-matches, observations = find_simultaneous(
+matches, observations = search(
     "Cyg X-1", ["NuSTAR", "XMM-Newton", "NICER"], tolerance=1, min_missions=2
 )
 matches["missions", "overlap", "nustar_obsid", "nicer_obsid"]
 observations["nicer"]  # every NICER observation of the source
 
-from find_simultaneous import group_matches
+from multi_eyes import group_matches
 
 campaigns = group_matches(matches)  # one row per campaign
 ```
@@ -96,7 +96,7 @@ campaigns = group_matches(matches)  # one row per campaign
 of missions that are not in a group are masked.
 
 If you already have observation lists (for example from another archive), the matching
-can be used on its own: `find_simultaneous.find_matches({"a": table_a, "b": table_b},
+can be used on its own: `multi_eyes.find_matches({"a": table_a, "b": table_b},
 tolerance=0.5)`, where each table has `obsid`, `start` and `end` columns in MJD.
 
 ## Limitations

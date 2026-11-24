@@ -3,7 +3,7 @@ Command-line interface.
 
 Example::
 
-    find-simultaneous "Cyg X-1" nustar xmm nicer --tolerance 1d -o cygx1.ecsv
+    multi-eyes "Cyg X-1" nustar xmm nicer --tolerance 1d -o cygx1.ecsv
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from astropy.time import Time
 
 from .group import group_matches
 from .missions import list_missions, resolve_mission
-from .query import find_simultaneous
+from .query import search
 
 __all__ = ["main", "parse_tolerance", "parse_radius", "summary_table", "campaign_summary"]
 
@@ -122,7 +122,7 @@ def _campaign_path(path):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(
-        prog="find-simultaneous",
+        prog="multi-eyes",
         description=(
             "Find observations of a source made by several missions at the same time, "
             "or within a tolerance, using the HEASARC observation catalogues."
@@ -182,7 +182,7 @@ def main(argv=None):
     except (ValueError, argparse.ArgumentTypeError) as err:
         parser.error(str(err))
 
-    matches, observations = find_simultaneous(
+    matches, observations = search(
         args.source,
         missions,
         tolerance=args.tolerance,
